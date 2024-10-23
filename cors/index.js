@@ -73,9 +73,7 @@ async function fetchHandler(request, env, ctx) {
             //输出提示
             const invalid = !(request.method == "OPTIONS" || url.length === 0)
             outBody = JSON.stringify({
-                code: invalid ? 400 : 0,
-                usage: 'Host/{URL}',
-                source: 'https://github.com/Rongronggg9/rsstt-img-relay'
+                code: invalid ? 400 : 0
             });
             outCt = "application/json";
             outStatus = invalid ? 400 : 200;
@@ -137,7 +135,7 @@ async function fetchHandler(request, env, ctx) {
             let fr = (await fetch(url, fp));
             outCt = fr.headers.get('content-type');
             // 阻断
-            if (blockType(outCt)) {
+            if (outCt && blockType(outCt)) {
                 outBody = JSON.stringify({
                     code: 415,
                     msg: 'The keyword "' + config.typeList.join(' , ') + '" was whitelisted by the operator of this proxy, but got "' + outCt + '".'
@@ -206,6 +204,7 @@ function blockUrl(url) {
     let len = config.blockList.filter(x => url.includes(x)).length;
     return len != 0;
 }
+
 // 阻断 type
 function blockType(type) {
     type = type.toLowerCase();
